@@ -20,7 +20,7 @@ public class CategoryTypeService {
     }
 
     public CategoryType findById(Long id) {
-        return categoryTypeRepository.findById(id).orElse(new CategoryType());
+        return categoryTypeRepository.findById(id).orElse(null);
     }
 
     public List<CategoryType> findAll() {

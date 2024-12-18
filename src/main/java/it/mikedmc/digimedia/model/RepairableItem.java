@@ -12,8 +12,8 @@ public class RepairableItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @JoinColumn(name = "category_type_id", nullable = false)
+    private CategoryType categoryType;
 
     @Column(nullable = false, unique = true)
     private String code;
@@ -29,6 +29,7 @@ public class RepairableItem {
     @OneToMany(mappedBy = "repairableItem", cascade = CascadeType.ALL)
     private List<RepairableItemComponent> components;
 
+
     public Long getId() {
         return id;
     }
@@ -37,12 +38,12 @@ public class RepairableItem {
         this.id = id;
     }
 
-    public Category getCategory() {
-        return category;
+    public CategoryType getCategoryType() {
+        return categoryType;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategoryType(CategoryType categoryType) {
+        this.categoryType = categoryType;
     }
 
     public String getCode() {
@@ -84,4 +85,5 @@ public class RepairableItem {
     public void setComponents(List<RepairableItemComponent> components) {
         this.components = components;
     }
+
 }

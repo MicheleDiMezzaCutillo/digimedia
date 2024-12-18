@@ -19,9 +19,6 @@ public class Category {
     private CategoryType categoryType;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<RepairableItem> repairableItems;
-
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Component> components;
 
     public Long getId() {
@@ -46,14 +43,6 @@ public class Category {
 
     public void setCategoryType(CategoryType categoryType) {
         this.categoryType = categoryType;
-    }
-
-    public List<RepairableItem> getRepairableItems() {
-        return repairableItems;
-    }
-
-    public void setRepairableItems(List<RepairableItem> repairableItems) {
-        this.repairableItems = repairableItems;
     }
 
     public List<Component> getComponents() {

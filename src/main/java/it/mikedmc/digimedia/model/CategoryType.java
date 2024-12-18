@@ -18,16 +18,13 @@ public class CategoryType {
     @OneToMany(mappedBy = "categoryType", cascade = CascadeType.ALL)
     private List<Category> categories;
 
-    @Transient // Non viene salvato nel database, ma calcolato dinamicamente
-    public List<RepairableItem> getRepairableItems() {
-        List<RepairableItem> repairableItems = new ArrayList<>();
-        if (categories != null) {
-            for (Category category : categories) {
-                repairableItems.addAll(category.getRepairableItems());
-            }
-        }
-        return repairableItems;
-    }
+
+    @OneToMany(mappedBy = "categoryType", cascade = CascadeType.ALL)
+    private List<RepairableItem> repairableItems;
+
+   @OneToMany(mappedBy = "categoryType", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Component> components;
+
     public Long getId() {
         return id;
     }
@@ -50,5 +47,23 @@ public class CategoryType {
 
     public void setCategories(List<Category> categories) {
         this.categories = categories;
+    }
+
+    public List<RepairableItem> getRepairableItems() {
+        return repairableItems;
+    }
+
+    public void setRepairableItems(List<RepairableItem> repairableItems) {
+        this.repairableItems = repairableItems;
+    }
+
+
+    // Getter e Setter
+    public List<Component> getComponents() {
+        return components;
+    }
+
+    public void setComponents(List<Component> components) {
+        this.components = components;
     }
 }
