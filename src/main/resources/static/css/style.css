@@ -1,0 +1,32 @@
+/* Stili personalizzati per i Toast */
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1055;
+}
+
+.toast-body {
+    display: flex;
+    align-items: center;
+}
+
+.toast-body i {
+    margin-right: 0.5rem;
+}
+
+.category-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Due colonne */
+    gap: 20px; /* Spazio tra le schede */
+}
+
+.fixed-height {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.scrollable-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
