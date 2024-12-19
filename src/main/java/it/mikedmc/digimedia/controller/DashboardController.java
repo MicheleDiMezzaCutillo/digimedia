@@ -8,6 +8,8 @@ import it.mikedmc.digimedia.repository.CategoryTypeRepository;
 import it.mikedmc.digimedia.repository.ComponentRepository;
 import it.mikedmc.digimedia.repository.RepairableItemRepository;
 import it.mikedmc.digimedia.service.CategoryTypeService;
+import it.mikedmc.digimedia.service.ComponentService;
+import it.mikedmc.digimedia.service.RepairableItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,12 +17,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/")
 public class DashboardController {
 
     @Autowired
@@ -29,8 +29,15 @@ public class DashboardController {
     @Autowired
     private CategoryTypeService categoryTypeService;
 
-    @GetMapping
+    @Autowired
+    private RepairableItemService repairableItemService;
+
+    @Autowired
+    private ComponentService componentService;
+
+    @GetMapping("/")
     public String showDashboard(Model model) {
+
         List<CategoryType> categories = categoryTypeService.findAll();
         int totalItems = repairableItemRepository.countItems();
         int totalQuantity = repairableItemRepository.sumQuantities();
@@ -42,35 +49,24 @@ public class DashboardController {
         return "dashboard";
     }
 
-    @GetMapping("/{categoryTypeId}")
-    public String showCategoryTypeDetails(
-            @PathVariable Long categoryTypeId,
-            Model model) {
-        // Recupera la CategoryType selezionata
+    @GetMapping("/repairable-item/{categoryTypeId}")
+    public String showCategoryTypeDetails(@PathVariable Long categoryTypeId, Model model) {
         CategoryType categoryType = categoryTypeService.findById(categoryTypeId);
 
         if (categoryType == null) {
+            model.addAttribute("errorMessage", "La categoria a cui stai provando ad accedere non esiste.");
             return "error";
         }
 
-        // Recupera tutte le categorie associate
-        List<Category> categories = categoryType.getCategories();
+        // Map di Category -> Component
+        Map<Category, List<Component>> componentsGroupedByCategory = componentService.getComponentsGroupedByCategory(categoryType);
 
-        // Organizza i dati per le sezioni
-        Map<Category, List<RepairableItem>> repairableItemsByCategory = new HashMap<>();
-        Map<Category, List<Component>> componentsByCategory = new HashMap<>();
-
-        for (Category category : categories) {
-            repairableItemsByCategory.put(category, category.getRepairableItems());
-            componentsByCategory.put(category, category.getComponents());
-        }
-
-        // Aggiungi dati al modello
+        // Aggiunta al modello
         model.addAttribute("categoryType", categoryType);
-        model.addAttribute("repairableItemsByCategory", repairableItemsByCategory);
-        model.addAttribute("componentsByCategory", componentsByCategory);
+        model.addAttribute("repairableItems", categoryType.getRepairableItems());
+        model.addAttribute("componentsGroupedByCategory", componentsGroupedByCategory);
 
-        return "category-type-details";
+        return "repairable-item-and-comonents";
     }
-
+    
 }
