@@ -18,5 +18,18 @@ public interface ComponentRepository extends JpaRepository<Component,Long> {
     @Query("SELECT c FROM Component c WHERE LOWER(c.code) LIKE LOWER(CONCAT('%', :query, '%')) AND c.categoryType.id = :categoryTypeId AND c.category.id = :categoryId")
     List<Component> searchComponents(@Param("query") String query, @Param("categoryTypeId") Long categoryTypeId, @Param("categoryId") Long categoryId);
 
+    @Query("""
+        SELECT c 
+        FROM Component c 
+        WHERE c.category.id = :categoryId 
+          AND c.id NOT IN (
+              SELECT ric.component.id 
+              FROM RepairableItemComponent ric 
+              WHERE ric.repairableItem.id = :repairableItemId
+          )
+        """)
+    List<Component> findComponentsNotLinkedToRepairableItem(@Param("categoryId") Long categoryId,
+                                                            @Param("repairableItemId") Long repairableItemId);
+
 
 }
