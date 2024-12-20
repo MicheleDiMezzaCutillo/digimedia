@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${categoryType.name}">Dettagli Categoria</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" />
+
+</head>
+<body>
+<div th:replace="~{fragments/flash-messages :: flash-messages}"></div>
+
+<div class="container mt-4">
+
+    <!-- Titolo principale -->
+    <div class="section-title">
+        <h1 th:text="${categoryType.name}">Dettagli Categoria</h1>
+    </div>
+    <hr>
+
+    <!-- Barra di ricerca per RepairableItem -->
+    <div class="mb-4">
+        <h2>Oggetti Riparabili</h2>
+        <ul class="list-group scrollable-list">
+            <li class="list-group-item d-flex flex-column gap-2">
+                <!-- Riga principale con codice, quantità e posizione -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Form per inviare il codice -->
+                    <form th:action="@{/repairable-item/findById/{repairableItemId}(repairableItemId=${repairableItem.id})}" method="get" class="d-inline">
+                        <input type="hidden" name="code" th:value="${repairableItem.code}">
+                        <button type="submit" class="btn btn-outline-primary btn-sm" th:text="${repairableItem.code}">Codice</button>
+                    </form>
+                    <!-- Posizione -->
+                    <span class="text-muted" th:text="'Posizione: ' + ${repairableItem.location}">Posizione</span>
+                    <!-- Quantità e bottoni -->
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary" th:text="'Quantità: ' + ${repairableItem.quantity}">Quantità</span>
+                        <!-- Bottone -1 -->
+                        <form th:action="@{/repairable-item/decrement-quantity/{repairableItemId}(repairableItemId=${repairableItem.id})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                -1
+                            </button>
+                        </form>
+                        <!-- Bottone modifica -->
+                        <form th:action="@{/repairable-item/edit/{repairableItemId}(repairableItemId=${repairableItem.id})}" method="get" class="d-inline">
+                            <button type="submit" class="btn btn-outline-warning btn-sm">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                        </form>
+
+                        <!-- Bottone per eliminare -->
+                        <form th:action="@{/repairable-item/delete/{repairableItemId}(repairableItemId=${repairableItem.id})}" method="POST" class="d-inline">
+                            <button type="submit"
+                                    class="btn btn-outline-danger btn-sm"
+                                    onclick="return confirm('Sei sicuro di voler eliminare questo componente?');">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <!-- Note opzionali -->
+                <div class="text-muted fst-italic" th:if="${repairableItem.notes != null}">
+                    <small th:text="'Note: ' + ${repairableItem.notes}"></small>
+                </div>
+            </li>
+        </ul>
+
+    </div>
+
+
+    <h2>Componenti</h2>
+    <div class="row">
+        <div class="col-md-6 mb-4" th:each="entry : ${componentsGroupedByCategory}">
+            <div class="card">
+                <div class="card-header" th:text="${entry.key.name}">Categoria</div>
+                <div class="card-body scrollable-list">
+                    <!-- Barra di ricerca -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="search-group d-flex flex-grow-1 me-2">
+                            <input type="text" class="form-control search-input"
+                                   th:placeholder="'Cerca in: ' + ${entry.key.name}"
+                                   oninput="filterList(this)"> <!-- Evento oninput -->
+                        </div>
+                        <form th:action="@{/repairable-item-component/from-component}" method="get" class="d-inline">
+                            <input type="hidden" name="repairableItemId" th:value="${repairableItem.id}" />
+                            <input type="hidden" name="categoryId" th:value="${entry.key.id}" />
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa-solid fa-link"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Lista componenti -->
+                    <ul class="list-group fixed-height">
+                        <li class="list-group-item d-flex align-items-center" th:each="component : ${entry.value}">
+                            <form th:action="@{/component/findById/{componentId}(componentId=${component.id})}" method="get" class="d-inline">
+                                <input type="hidden" name="code" th:value="${component.code}">
+                                <button type="submit" class="btn btn-outline-primary btn-sm" th:text="${component.code}">Codice</button>
+                            </form>
+
+                            <!-- Spazio per centrare la quantità -->
+                            <div class="flex-grow-1 text-center">
+                                <!-- Quantità -->
+                                <span th:text="'Quantità: ' + ${component.quantity}" class="badge bg-primary"></span>
+                            </div>
+
+                            <!-- Azioni (bottoni allineati a destra) -->
+                            <div class="d-flex gap-2 align-items-center">
+                                <!-- Bottone info -->
+                                <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+                                        data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true"
+                                        th:data-bs-content="${component.notes != null ? 'Location: ' + component.location + '<br>Notes: ' + component.notes : 'Location: ' + component.location}">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                </button>
+
+                                <!-- Form per decrementare quantità -->
+                                <form th:action="@{/component/decrement-quantity/{componentId}(componentId=${component.id})}" method="post" class="d-inline">
+                                    <input type="hidden" name="code" th:value="${component.code}">
+                                    <button type="submit" style="line-height: 1;" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1">
+                                        -1
+                                    </button>
+                                </form>
+
+                                <!-- Form per modifica -->
+                                <form th:action="@{/component/edit/{componentId}(componentId=${component.id})}" method="GET" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                </form>
+
+                                <!-- Form per eliminare -->
+                                <form th:action="@{/repairable-item-component/unlink}" method="POST" class="d-inline">
+                                    <input type="hidden" name="componentId" th:value="${component.id}">
+                                    <input type="hidden" name="repairableItemId" th:value="${repairableItem.id}">
+                                    <button type="submit"
+                                            class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1"
+                                            onclick="return confirm('Sei sicuro di voler scollegare questo componente all'oggetto?');">
+                                        <i class="fa-solid fa-link-slash"></i>
+                                    </button>
+                                </form>
+
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="alert alert-warning text-center mt-3" th:if="${entry.value.isEmpty()}">
+                        Nessun componente presente.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<script>
+    // Inizializza tutti i popover presenti nella pagina
+    document.addEventListener('DOMContentLoaded', function () {
+        const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        const popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl);
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        toastElList.forEach(function (toastEl) {
+            var toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        });
+    });
+
+    function filterList(inputElement) {
+        // Prendi il valore dell'input e convertilo in minuscolo per il confronto
+        const filter = inputElement.value.toLowerCase().trim();
+        console.log('Filtro attivato con valore:', filter);
+
+        // Trova la lista <ul> più vicina all'input
+        const listGroup = inputElement.closest('.card-body').querySelector('.list-group');
+
+        if (listGroup) {
+            // Prendi tutti gli elementi <li> della lista
+            const items = listGroup.querySelectorAll('.list-group-item');
+
+            // Filtra gli elementi
+            items.forEach((item) => {
+                // Trova il bottone con il codice del componente
+                const codeButton = item.querySelector('button');
+
+                if (codeButton) {
+                    const codeText = codeButton.textContent.toLowerCase();
+                    console.log('Testo del codice:', codeText);
+
+                    // Mostra o nascondi l'elemento in base al filtro
+                    if (codeText.includes(filter)) {
+                        item.style.setProperty('display', '', 'important'); // Mostra
+                    } else {
+                        item.style.setProperty('display', 'none', 'important'); // Nascondi
+                    }
+                }
+            });
+        }
+    }
+
+</script>
+</body>
+</html>

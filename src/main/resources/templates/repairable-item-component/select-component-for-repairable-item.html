@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crea e Cerca Componenti</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+<div class="container mt-4">
+  <!-- Titolo principale -->
+  <div class="section-title text-center">
+    <h1>Crea e Cerca Componenti</h1>
+  </div>
+  <hr>
+
+  <!-- Bottone grande -->
+  <div class="text-center mb-4">
+    <form th:action="@{/component/create}" method="post">
+      <input type="hidden" name="repairableItemId" th:value="${repairableItemId}" />
+      <button type="submit" class="btn btn-success btn-lg">
+        <i class="fa-solid fa-plus"></i> Crea nuovo ed aggiungi all'oggetto
+      </button>
+    </form>
+  </div>
+
+  <!-- Barra di ricerca -->
+  <div class="mb-4">
+    <div class="input-group">
+      <input type="text" id="searchBar" class="form-control" placeholder="Cerca per Codice...">
+      <button class="btn btn-primary">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista componenti -->
+  <ul class="list-group" id="componentList">
+    <li class="list-group-item d-flex justify-content-between align-items-center" th:each="component : ${components}">
+      <form th:action="@{/repairable-item-component/link}" method="get" class="d-flex w-100 justify-content-between">
+        <input type="hidden" name="componentId" th:value="${component.id}">
+        <input type="hidden" name="repairableItemId" th:value="${repairableItemId}">
+        <span th:text="${component.code}">Code</span>
+        <button type="submit" class="btn btn-outline-primary btn-sm">Aggiungi</button>
+      </form>
+    </li>
+  </ul>
+
+  <div class="alert alert-warning text-center mt-3" id="noResults" style="display: none;">
+    Nessun componente trovato.
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchBar = document.getElementById('searchBar');
+    const componentList = document.getElementById('componentList');
+    const noResults = document.getElementById('noResults');
+
+    searchBar.addEventListener('input', () => {
+      const filter = searchBar.value.toLowerCase().trim();
+      const items = componentList.querySelectorAll('.list-group-item');
+
+      let hasVisibleItems = false;
+
+      items.forEach((item) => {
+        const codeText = item.querySelector('span').textContent.toLowerCase();
+
+        if (codeText.includes(filter)) {
+          item.style.setProperty('display', 'flex', 'important');
+          hasVisibleItems = true;
+        } else {
+          item.style.setProperty('display', 'none', 'important');
+        }
+      });
+
+      noResults.style.display = hasVisibleItems ? 'none' : 'block';
+    });
+  });
+</script>
+</body>
+</html>

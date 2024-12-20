@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${categoryType.name}">Dettagli Componente</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+        .scrollable-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+  </style>
+</head>
+<body>
+<div th:replace="~{fragments/flash-messages :: flash-messages}"></div>
+
+<div class="container mt-4">
+
+  <!-- Titolo principale -->
+  <div class="section-title">
+    <h1 th:text="${categoryType.name}">Dettagli Categoria</h1>
+  </div>
+  <hr>
+
+  <!-- Barra di ricerca per RepairableItem -->
+  <div class="mb-4">
+    <h2>Componenti</h2>
+    <form th:action="@{/component/searchRepairableItems}" class="mb-3">
+      <div class="input-group">
+        <input type="text" name="query" class="form-control" placeholder="Cerca un componente..." />
+        <input type="hidden" name="categoryId" th:value="${categoryId}">
+        <input type="hidden" name="categoryTypeId" th:value="${categoryType.id}" />
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-search"></i> Cerca
+        </button>
+      </div>
+    </form>
+
+    <ul class="list-group scrollable-list">
+      <li class="list-group-item d-flex flex-column gap-2">
+        <!-- Riga principale con codice, quantità e posizione -->
+        <div class="d-flex justify-content-between align-items-center">
+          <!-- Form per inviare il codice -->
+          <form th:action="@{/repairable-item/findById/{repairableItemId}(repairableItemId=${component.id})}" method="get" class="d-inline">
+            <input type="hidden" name="code" th:value="${component.code}">
+            <button type="submit" class="btn btn-outline-primary btn-sm" th:text="${component.code}">Codice</button>
+          </form>
+          <!-- Posizione -->
+          <span class="text-muted" th:text="'Posizione: ' + ${component.location}">Posizione</span>
+          <!-- Quantità e bottoni -->
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary" th:text="'Quantità: ' + ${component.quantity}">Quantità</span>
+            <!-- Bottone -1 -->
+            <form th:action="@{/repairable-item/decrementQuantity/{repairableItemId}(repairableItemId=${component.id})}" method="post" class="d-inline">
+              <button type="submit" class="btn btn-outline-danger btn-sm">
+                -1
+              </button>
+            </form>
+            <!-- Bottone modifica -->
+            <form th:action="@{/repairable-item/edit/{repairableItemId}(repairableItemId=${component.id})}" method="get" class="d-inline">
+              <button type="submit" class="btn btn-outline-warning btn-sm">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+        <!-- Note opzionali -->
+        <div class="text-muted fst-italic" th:if="${component.notes != null}">
+          <small th:text="'Note: ' + ${component.notes}"></small>
+        </div>
+      </li>
+    </ul>
+    <div class="alert alert-warning text-center mt-3" th:if="${component == null}">
+      Nessun componente presente.
+    </div>
+
+  </div>
+  <hr>
+  <h2>Oggetti Riparabili</h2>
+  <ul class="list-group scrollable-list">
+    <li class="list-group-item d-flex flex-column gap-2" th:each="item : ${repairableItems}">
+      <!-- Riga principale con codice, quantità e posizione -->
+      <div class="d-flex justify-content-between align-items-center">
+        <!-- Form per inviare il codice -->
+        <form th:action="@{/repairable-item/findById/{repairableItemId}(repairableItemId=${item.id})}" method="get" class="d-inline">
+          <input type="hidden" name="code" th:value="${item.code}">
+          <button type="submit" class="btn btn-outline-primary btn-sm" th:text="${item.code}">Codice</button>
+        </form>
+        <!-- Posizione -->
+        <span class="text-muted" th:text="'Posizione: ' + ${item.location}">Posizione</span>
+        <!-- Quantità e bottoni -->
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-primary" th:text="'Quantità: ' + ${item.quantity}">Quantità</span>
+          <!-- Bottone -1 -->
+          <form th:action="@{/repairable-item/decrementQuantity/{repairableItemId}(repairableItemId=${item.id})}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+              -1
+            </button>
+          </form>
+          <!-- Bottone modifica -->
+          <form th:action="@{/repairable-item/edit/{repairableItemId}(repairableItemId=${item.id})}" method="get" class="d-inline">
+            <button type="submit" class="btn btn-outline-warning btn-sm">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      <!-- Note opzionali -->
+      <div class="text-muted fst-italic" th:if="${item.notes != null}">
+        <small th:text="'Note: ' + ${item.notes}"></small>
+      </div>
+    </li>
+  </ul>
+
+
+  <div class="alert alert-warning text-center mt-3" th:if="${repairableItems.isEmpty()}">
+    Nessun oggetto presente.
+  </div>
+  <!-- Lista dei RepairableItem collegati -->
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
