@@ -68,4 +68,7 @@ public class RepairableItemService {
         }
     }
 
+    public List<RepairableItem> findRepairableItemsNotLinkedToComponent(Long categoryTypeId, Long componentId) {
+        return repairableItemRepository.findRepairableItemsNotLinkedToComponent(categoryTypeId, componentId);
+    }
 }
