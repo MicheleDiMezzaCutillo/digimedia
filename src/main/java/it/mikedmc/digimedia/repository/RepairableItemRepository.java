@@ -32,5 +32,16 @@ public interface RepairableItemRepository extends JpaRepository<RepairableItem,L
     @Query("SELECT r FROM RepairableItem r WHERE LOWER(r.code) LIKE LOWER(CONCAT('%', :query, '%')) AND r.categoryType.id = :categoryTypeId")
     List<RepairableItem> searchRepairableItems(@Param("query") String query, @Param("categoryTypeId") Long categoryTypeId);
 
-
+    @Query("""
+        SELECT r
+        FROM RepairableItem r
+        WHERE r.categoryType.id = :categoryTypeId
+        AND r.id NOT IN (
+            SELECT ric.repairableItem.id
+            FROM RepairableItemComponent ric
+            WHERE ric.component.id = :componentId
+        )
+    """)
+    List<RepairableItem> findRepairableItemsNotLinkedToComponent(@Param("categoryTypeId") Long categoryTypeId,
+                                                                 @Param("componentId") Long componentId);
 }
