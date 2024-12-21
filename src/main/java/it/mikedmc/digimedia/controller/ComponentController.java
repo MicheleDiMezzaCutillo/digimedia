@@ -54,7 +54,7 @@ public class ComponentController {
         model.addAttribute("repairableItems",repairableItems);
         model.addAttribute("component", component);
 
-        return "component/components-and-repairable-item";
+        return "component/component-detail";
     }
 
     @GetMapping("/searchRepairableItems")
@@ -96,6 +96,16 @@ public class ComponentController {
         return "component/component-edit-or-create";
     }
 
+    @GetMapping("/create-and-link")
+    public String showCreateForm2(Model model, @RequestParam("categoryTypeId") Long categoryTypeId, @RequestParam("categoryId") Long categoryId, @RequestParam("repairableItemId") Long repairableItemId) {
+        ComponentDto componentDto = new ComponentDto();
+        componentDto.setCategoryType(categoryTypeRepository.findById(categoryTypeId).orElseThrow());
+        componentDto.setCategory(categoryRepository.findById(categoryId).orElseThrow());
+        model.addAttribute("componentDto", componentDto);
+        model.addAttribute("repairableItemId",repairableItemId);
+        return "component/component-create-for-link";
+    }
+
     @PostMapping("/edit/{componentId}")
     public String updateComponent(@PathVariable Long componentId, @ModelAttribute ComponentDto componentDto) {
         componentService.save(ComponentDtoBuilder.fromDtoToEntity(componentDto));
@@ -107,13 +117,25 @@ public class ComponentController {
         return "redirect:/component/findById/"+componentService.save(ComponentDtoBuilder.fromDtoToEntity(componentDto)).getId();
     }
 
+    @PostMapping("/create-and-link")
+    public String createComponent2(@ModelAttribute ComponentDto componentDto,@RequestParam("repairableItemId") Long repairableItemId) {
+        return "redirect:/repairable-item-component/link?componentId=" + componentService.save(ComponentDtoBuilder.fromDtoToEntity(componentDto)).getId() + "&repairableItemId=" + repairableItemId;
+    }
+
+
     @PostMapping("/delete/{componentId}")
     public String deleteComponent(@PathVariable Long componentId, @RequestHeader(value = "Referer", required = false) String referer, RedirectAttributes redirectAttributes) {
         componentService.delete(componentId);
         redirectAttributes.addFlashAttribute("successMessage", "Componente eliminato con successo.");
-        redirectAttributes.addFlashAttribute("errorMessage", "Componente eliminato ses.");
 
         return "redirect:" + (referer != null ? referer : "/default-page");
+    }
+
+    @PostMapping("/delete2/{componentId}")
+    public String deleteComponent2(@PathVariable Long componentId, @RequestParam("categoryTypeId") Long categoryTypeId, RedirectAttributes redirectAttributes) {
+        componentService.delete(componentId);
+        redirectAttributes.addFlashAttribute("successMessage", "Componente eliminato con successo.");
+        return "redirect:/repairable-item/"+categoryTypeId;
     }
 
     @PostMapping("/decrement-quantity/{componentId}")
