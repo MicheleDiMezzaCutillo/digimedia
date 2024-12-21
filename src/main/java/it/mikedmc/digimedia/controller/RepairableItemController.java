@@ -8,6 +8,7 @@ import it.mikedmc.digimedia.repository.RepairableItemRepository;
 import it.mikedmc.digimedia.service.CategoryTypeService;
 import it.mikedmc.digimedia.service.RepairableItemComponentService;
 import it.mikedmc.digimedia.service.RepairableItemService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
@@ -94,6 +95,16 @@ public class RepairableItemController {
         return "repairable-item/repairable-item-edit-or-create";
     }
 
+    @GetMapping("/create-and-link")
+    public String showCreateForm2(Model model, @RequestParam("categoryTypeId") Long categoryTypeId, @RequestParam("componentId") Long componentId) {
+        RepairableItemDto repairableItemDto = new RepairableItemDto();
+        repairableItemDto.setCategoryType(categoryTypeRepository.findById(categoryTypeId).orElseThrow());
+        model.addAttribute("repairableItemDto", repairableItemDto);
+        model.addAttribute("componentId", componentId);
+        return "repairable-item/repairable-item-create-for-link";
+    }
+
+
     @PostMapping("/edit/{repairableItemId}")
     public String updateRepairableItem(@PathVariable Long repairableItemId, @ModelAttribute RepairableItemDto repairableItemDto) {
         repairableItemService.save(RepairableItemDtoBuilder.fromDtoToEntity(repairableItemDto));
@@ -105,11 +116,23 @@ public class RepairableItemController {
         return "redirect:/repairable-item/findById/"+repairableItemService.save(RepairableItemDtoBuilder.fromDtoToEntity(repairableItemDto)).getId();
     }
 
+    @PostMapping("/create-and-link")
+    public String createRepairableItem2(@ModelAttribute RepairableItemDto repairableItemDto, @RequestParam("componentId") Long componentId) {
+        return "redirect:/repairable-item-component/link?componentId=" + componentId + "&repairableItemId=" + repairableItemService.save(RepairableItemDtoBuilder.fromDtoToEntity(repairableItemDto)).getId();
+    }
+
     @PostMapping("/delete/{repairableItemId}")
     public String deleteRepairableItem(@PathVariable Long repairableItemId, @RequestHeader(value = "Referer", required = false) String referer, RedirectAttributes redirectAttributes) {
         repairableItemService.delete(repairableItemId);
         redirectAttributes.addFlashAttribute("successMessage", "Oggetto eliminato con successo.");
         return "redirect:" + (referer != null ? referer : "/default-page");
+    }
+
+    @PostMapping("/delete2/{repairableItemId}")
+    public String deleteRepairableItem2(@PathVariable Long repairableItemId, @RequestParam("categoryTypeId") Long categoryTypeId, RedirectAttributes redirectAttributes) {
+        repairableItemService.delete(repairableItemId);
+        redirectAttributes.addFlashAttribute("successMessage", "Oggetto eliminato con successo.");
+        return "redirect:/repairable-item/"+categoryTypeId;
     }
 
     @PostMapping("/decrement-quantity/{repairableItemId}")
