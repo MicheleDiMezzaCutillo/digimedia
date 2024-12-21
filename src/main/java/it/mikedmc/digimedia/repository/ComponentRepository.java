@@ -30,6 +30,4 @@ public interface ComponentRepository extends JpaRepository<Component,Long> {
         """)
     List<Component> findComponentsNotLinkedToRepairableItem(@Param("categoryId") Long categoryId,
                                                             @Param("repairableItemId") Long repairableItemId);
-
-
 }
