@@ -34,7 +34,7 @@ public class RepairableItemComponentController {
 
         redirectAttributes.addFlashAttribute("successMessage","Collegamento fatto con successo.");
         String returnTo = (String) session.getAttribute("returnTo");
-        return "redirect:" + (returnTo != null ? returnTo : "/default-page");
+        return "redirect:" + (returnTo != null ? returnTo : "/");
     }
 
     @PostMapping("/unlink")
@@ -48,25 +48,22 @@ public class RepairableItemComponentController {
     }
 
     @GetMapping("/from-component")
-    public String linkRepairableItemComponentFromComponent (Model model, @RequestHeader(value = "Referer", required = false) String referer, HttpSession session, @RequestParam("categoryId") Long categoryId, @RequestParam("repairableItemId") Long repairableItemId) {
-        // pagina che mostra una lista inntera di componenti in base alla categoria e categoria type
+    public String linkRepairableItemComponentFromComponent (Model model, @RequestHeader(value = "Referer", required = false) String referer, HttpSession session, @RequestParam("categoryId") Long categoryId, @RequestParam("repairableItemId") Long repairableItemId, @RequestParam("categoryTypeId") Long categoryTypeId) {
         session.setAttribute("returnTo", referer);
+        model.addAttribute("categoryTypeId",categoryTypeId);
+        model.addAttribute("categoryId",categoryId);
         model.addAttribute("repairableItemId",repairableItemId);
         model.addAttribute("components", componentService.findComponentsNotLinkedToRepairableItem(categoryId, repairableItemId));
         return "repairable-item-component/select-component-for-repairable-item";
     }
 
-    @PostMapping("/from-component")
-    public String linkRepairableItemComponentFromComponentFinish (Model model, @RequestParam("componentId") Long componentId, @RequestParam("repairableItemId") Long repairableItemId) {
-        RepairableItemComponent repairableItemComponent = new RepairableItemComponent();
-        repairableItemComponent.setComponent(componentService.findById(componentId));
-        repairableItemComponent.setRepairableItem(repairableItemService.findById(repairableItemId));
-        repairableItemComponentService.save(repairableItemComponent);
-        return "";
+    @GetMapping("/from-repairable-item")
+    public String linkRepairableItemComponentFromRepairableItem (Model model, @RequestHeader(value = "Referer", required = false) String referer, HttpSession session, @RequestParam("categoryTypeId") Long categoryTypeId, @RequestParam("componentId") Long componentId) {
+        session.setAttribute("returnTo", referer);
+        model.addAttribute("componentId",componentId);
+        model.addAttribute("categoryTypeId",categoryTypeId);
+        model.addAttribute("repairableItems", repairableItemService.findRepairableItemsNotLinkedToComponent(categoryTypeId, componentId));
+        return "repairable-item-component/select-repairable-item-for-component";
     }
 
-    @GetMapping("/from-repairable-item")
-    public String linkRepairableItemComponentFromRepairableItem () {
-        return "";
-    }
 }
