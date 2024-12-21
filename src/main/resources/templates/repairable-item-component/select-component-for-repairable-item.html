@@ -19,7 +19,9 @@
 
   <!-- Bottone grande -->
   <div class="text-center mb-4">
-    <form th:action="@{/component/create}" method="post">
+    <form th:action="@{/component/create-and-link}" method="get">
+      <input type="hidden" name="categoryTypeId" th:value="${categoryTypeId}" />
+      <input type="hidden" name="categoryId" th:value="${categoryId}" />
       <input type="hidden" name="repairableItemId" th:value="${repairableItemId}" />
       <button type="submit" class="btn btn-success btn-lg">
         <i class="fa-solid fa-plus"></i> Crea nuovo ed aggiungi all'oggetto
@@ -38,7 +40,7 @@
   </div>
 
   <!-- Lista componenti -->
-  <ul class="list-group" id="componentList">
+  <ul class="list-group scrollable-list" id="componentList">
     <li class="list-group-item d-flex justify-content-between align-items-center" th:each="component : ${components}">
       <form th:action="@{/repairable-item-component/link}" method="get" class="d-flex w-100 justify-content-between">
         <input type="hidden" name="componentId" th:value="${component.id}">
@@ -51,6 +53,10 @@
 
   <div class="alert alert-warning text-center mt-3" id="noResults" style="display: none;">
     Nessun componente trovato.
+  </div>
+
+  <div class="alert alert-warning text-center mt-3" th:if="${components.isEmpty()}">
+    Nessun componente presente.
   </div>
 </div>
 
