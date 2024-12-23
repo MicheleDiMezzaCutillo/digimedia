@@ -117,7 +117,15 @@
 
 
     <!-- Categorie e Componenti -->
-    <h2>Componenti</h2>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2>Componenti</h2>
+        <form th:action="@{/category/list}" method="get" class="d-inline">
+            <input type="hidden" name="categoryTypeId" th:value="${categoryType.id}" />
+            <button type="submit" class="btn btn-success">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </form>
+    </div>
     <div class="row">
         <div class="col-md-6 mb-4" th:each="entry : ${componentsGroupedByCategory}">
             <div class="card">
