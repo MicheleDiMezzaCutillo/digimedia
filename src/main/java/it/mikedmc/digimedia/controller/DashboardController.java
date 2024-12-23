@@ -39,12 +39,7 @@ public class DashboardController {
     public String showDashboard(Model model) {
 
         List<CategoryType> categories = categoryTypeService.findAll();
-        int totalItems = repairableItemRepository.countItems();
-        int totalQuantity = repairableItemRepository.sumQuantities();
-
         model.addAttribute("categories", categories);
-        model.addAttribute("totalItems", totalItems);
-        model.addAttribute("totalQuantity", totalQuantity);
 
         return "dashboard";
     }
