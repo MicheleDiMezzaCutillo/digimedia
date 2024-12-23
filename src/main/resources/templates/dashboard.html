@@ -16,56 +16,51 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center">
         <h1 class="display-6">Magazzino Digimedia</h1>
-        <button class="btn btn-primary" onclick="location.href='/add-category-type'">Aggiungi Tipologia di Prodotti</button>
+        <button class="btn btn-primary" onclick="location.href='/category-type/create'">Aggiungi Tipologia di Prodotti</button>
     </div>
     <hr>
 
-    <!-- Statistics Section -->
-    <h3>Statistiche</h3>
-    <div class="row text-center mb-4">
-        <div class="col-md-4">
-            <div class="card bg-light p-3">
-                <h4>Prodotti Totali</h4>
-                <p class="fs-4 fw-bold" th:text="${categories.size()}">0</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-light p-3">
-                <h4>Componenti Totali</h4>
-                <p class="fs-4 fw-bold" th:text="${totalItems}">0</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-light p-3">
-                <h4>Quantità Totale</h4>
-                <p class="fs-4 fw-bold" th:text="${totalQuantity}">0</p>
-            </div>
-        </div>
-    </div>
-
     <!-- Category Management Section -->
-    <h3>Prodotti</h3>
+    <h3>Tipologie di Prodotti</h3>
     <div class="row">
-        <div class="col-md-6 col-lg-4 mb-3" th:each="category : ${categories}">
-            <div class="d-flex justify-content-between">
-                <form th:action="@{/repairable-item/{id}(id=${category.id})}" method="get" class="flex-grow-1">
-                    <button class="btn btn-outline-primary w-100" type="submit" th:text="${category.name}">Category Name</button>
-                </form>
-                <!-- Icon for editing -->
-                <a href="#" th:href="@{/category-type/edit/{id}(id=${category.id})}" class="btn btn-outline-warning ms-2">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <a th:href="@{/category-type/delete/{id}(id=${category.id})}"
-                   class="btn btn-outline-danger ms-2"
-                   onclick="return confirm('Sei sicuro di voler eliminare questo Prodotto?')">
-                    <i class="fa-solid fa-trash"></i>
-                </a>
+        <!-- Ciclo per ogni CategoryType -->
+        <div class="col-md-6 col-lg-4 mb-4" th:each="categoryType : ${categories}">
+            <div class="card shadow-sm p-3">
+                <!-- Nome del CategoryType -->
+                <h4 th:text="${categoryType.name}">Nome Categoria</h4>
+                <hr>
+
+                <!-- Statistiche -->
+                <div class="mb-3">
+                    <p class="mb-1"><strong>Totale Componenti:</strong> <span th:text="${categoryType.components.size()}">0</span></p>
+                    <p class="mb-1"><strong>Totale Oggetti Riparabili:</strong> <span th:text="${categoryType.repairableItems.size()}">0</span></p>
+                    <p class="mb-1"><strong>Totale Categorie:</strong> <span th:text="${categoryType.categories.size()}">0</span></p>
+                </div>
+
+                <!-- Azioni -->
+                <div class="d-flex justify-content-between">
+                    <!-- Form per accedere agli oggetti riparabili -->
+                    <form th:action="@{/repairable-item/{id}(id=${categoryType.id})}" method="get" class="flex-grow-1">
+                        <button class="btn btn-outline-primary w-100" type="submit" th:text="'Visualizza ' + ${categoryType.name}">Visualizza Oggetti</button>
+                    </form>
+                    <!-- Icona per modificare -->
+                    <a th:href="@{/category-type/edit/{id}(id=${categoryType.id})}" class="btn btn-outline-warning ms-2">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <!-- Icona per eliminare -->
+                    <a th:href="@{/category-type/delete/{id}(id=${categoryType.id})}"
+                       class="btn btn-outline-danger ms-2"
+                       onclick="return confirm('Sei sicuro di voler eliminare questa tipologia di prodotto?')">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Messaggio se non ci sono tipologie -->
     <div class="alert alert-info mt-4" th:if="${categories.isEmpty()}">
-        Nessun prodotto trovato. Inizia aggiungendone uno nuovo.
+        Nessuna tipologia di prodotto trovata. Inizia aggiungendone una nuova.
     </div>
 </div>
 
