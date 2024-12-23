@@ -1,9 +1,11 @@
 package it.mikedmc.digimedia.dto;
 
+import it.mikedmc.digimedia.model.CategoryType;
+
 public class CategoryDto {
     private Long id;
     private String name;
-    private Long categoryTypeId;
+    private CategoryType categoryType;
 
     public Long getId() {
         return id;
@@ -21,11 +23,11 @@ public class CategoryDto {
         this.name = name;
     }
 
-    public Long getCategoryTypeId() {
-        return categoryTypeId;
+    public CategoryType getCategoryType() {
+        return categoryType;
     }
 
-    public void setCategoryTypeId(Long categoryTypeId) {
-        this.categoryTypeId = categoryTypeId;
+    public void setCategoryType(CategoryType categoryType) {
+        this.categoryType = categoryType;
     }
 }
